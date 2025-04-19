@@ -1,0 +1,141 @@
+#coding:utf-8
+import pygame,random
+ 
+#初始化Pygame环境
+pygame.init()
+ 
+#获取屏幕信息
+screen_info = pygame.display.Info()
+screen_width = screen_info.current_w
+screen_height = screen_info.current_h
+ 
+#计算窗口尺寸
+window_width = int(screen_width * 0.3)
+window_height = int(screen_height * 0.8)
+ 
+#创建窗口 
+screen = pygame.display.set_mode((window_width, window_height)) #, pygame.RESIZABLE)  # 如果你希望窗口可调整大小，可以取消注释
+ 
+#设置窗口标题
+pygame.display.set_caption("Tank Turmoil")
+img_tank = "img_tank.png"
+
+#flag
+game_over = False
+
+#随机生成坦克位置
+x = random.randint(0, window_width - 100)
+y = random.randint(0, window_height - 100)
+
+#获取坦克的宽度和高度
+tank_image = pygame.image.load(img_tank)
+tank_width = tank_image.get_width()
+tank_height = tank_image.get_height()
+
+#坦克类
+class Tank_Player:
+    def __init__(self,img,x,y,life,speed1 = 5,skill = 0,deg = 0):
+        self.speed = speed1
+        self.life = life
+        self.x = x
+        self.y = y
+        self.deg = deg
+        self.img = pygame.image.load(img_tank)
+        self.skill = skill
+    
+    #坦克移动方法
+    def move(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] :
+            self.deg -= self.speed
+        if keys[pygame.K_RIGHT] :
+            self.deg += self.speed
+
+player = Tank_Player(img_tank,x,y,100)
+
+def draw_player():   
+        screen.blit(player.img,(player.x,player.y))
+
+
+#敌方坦克类
+class Tank_Enemy:
+    def __init__(self, img, x, y, life, speed2 = 5,deg = 0):
+        self.speed = speed2
+        self.life = life
+        self.x = x
+        self.y = y
+        self.img = pygame.image.load(img_tank)
+        self.deg = deg
+
+    #敌方坦克随机移动方法
+    def move(self):
+        if self.x < 0 or self.x > window_width - tank_width:
+            self.speed = -self.speed
+        if self.y < 0 or self.y > window_height - tank_height:
+            self.speed = -self.speed
+            self.x += random.randint(1,5)
+            self.y += random.randint(1,5)
+tank_enemy = Tank_Enemy(x,y,100)
+
+
+#子弹类
+class Bullet:
+    def __init__(self, x, y, speed, direction):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.direction = direction
+
+    #子弹移动方法
+    def move(self):
+        if self.direction == "up":
+            self.y -= self.speed
+        elif self.direction == "down":
+            self.y += self.speed
+        elif self.direction == "left":
+            self.x -= self.speed
+        elif self.direction == "right":
+            self.x += self.speed
+
+#主菜单与关卡系统
+def main_menu():
+    print("欢迎来到坦克对战游戏！")
+    print("1. 开始游戏")
+    print("2. 退出")
+    choice = input("请输入你的选择：")
+    if choice == '1':
+        print("游戏开始！")
+        return True
+    elif choice == '2':
+        print("退出游戏！")
+        return False
+    else:
+        print("无效选择，请重新输入!")
+        return main_menu()
+main_menu()
+
+#游戏循环
+running = True
+while running:
+    #处理事件
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    #敌方坦克随机移动
+    tank_enemy.move()
+    
+    #生命值与游戏结束判断
+    if player.life <= 0:
+        print("Game Over!")
+        game_over = True
+        running = False
+    
+    #延迟处理
+    pygame.time.delay(15)
+ 
+#更新显示
+pygame.display.flip()
+ 
+#退出Pygame
+pygame.quit()
