@@ -35,6 +35,12 @@ class Tank_Player:
             self.deg -= self.speed
         if keys[pygame.K_RIGHT] :
             self.deg += self.speed
+        if keys[pygame.K_up] :
+            self.x+=self.speed*cos(pi*self.deg/180)
+            self.y+=self.speed*sin(pi*self.deg/180)
+        if keys[pygame.K_up] :
+            self.x-=self.speed*cos(pi*self.deg/180)
+            self.y-=self.speed*sin(pi*self.deg/180)
         
 player = Tank_Player()
 def draw_player():   
